@@ -3,6 +3,7 @@ import "./style.css";
 import Header from "./Header";
 import Body from "./Body";
 import axios from "axios";
+import Footer from "./Footer";
 
 export interface Todo {
   id?: string;
@@ -79,6 +80,18 @@ export default function Layout() {
     setTodos((prev) => prev.map((t) => (t.id === id ? res.data : t)));
   };
 
+
+const deleteCompletedTodos = async () => {
+  const completed = todos.filter(todo => todo.completed);
+  await Promise.all(completed.map(todo => axios.delete(`http://localhost:3000/todos/${todo.id}`)));
+  setTodos(prev => prev.filter(todo => !todo.completed));
+};
+
+const deleteAllTodos = async () => {
+  await Promise.all(todos.map(todo => axios.delete(`http://localhost:3000/todos/${todo.id}`)));
+  setTodos([]);
+};
+
   return (
     <div
       style={{
@@ -102,6 +115,7 @@ export default function Layout() {
         toggleCompleted={toggleCompleted}
         filter={filter}
       ></Body>
+     <Footer deleteCompletedTodos={deleteCompletedTodos} deleteAllTodos={deleteAllTodos} />
     </div>
   );
 }
